@@ -3,14 +3,16 @@ package com.example.app.controller;
 import com.example.app.dto.AuthResponse;
 import com.example.app.dto.LoginRequest;
 import com.example.app.dto.RegisterRequest;
+import com.example.app.dto.UpdateProfileRequest;
+import com.example.app.dto.UserResponse;
 import com.example.app.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
     private final AuthService authService;
 
@@ -21,13 +23,33 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
-
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+        AuthResponse response = authService.login(request, session);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(HttpSession session) {
+        UserResponse response = authService.getCurrentUser(session);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponse> logout(HttpSession session) {
+        AuthResponse response = authService.logout(session);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<AuthResponse> updateProfile(
+            @Valid @RequestBody UpdateProfileRequest request,
+            HttpSession session
+    ) {
+        AuthResponse response = authService.updateProfile(request, session);
         return ResponseEntity.ok(response);
     }
 }

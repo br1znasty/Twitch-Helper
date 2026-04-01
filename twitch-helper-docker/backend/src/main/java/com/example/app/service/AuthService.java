@@ -3,8 +3,11 @@ package com.example.app.service;
 import com.example.app.dto.AuthResponse;
 import com.example.app.dto.LoginRequest;
 import com.example.app.dto.RegisterRequest;
+import com.example.app.dto.UpdateProfileRequest;
+import com.example.app.dto.UserResponse;
 import com.example.app.entity.User;
 import com.example.app.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,12 +19,12 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username is already taken");
         }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Email is already taken");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use");
         }
 
         User user = new User(
@@ -35,7 +38,7 @@ public class AuthService {
         return new AuthResponse("User registered successfully");
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request, HttpSession session) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
@@ -43,6 +46,58 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        return new AuthResponse("Login successfully");
+        session.setAttribute("userId", user.getId());
+
+        return new AuthResponse("Login successful");
+    }
+
+    public UserResponse getCurrentUser(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail());
+    }
+
+    public AuthResponse logout(HttpSession session) {
+        session.invalidate();
+        return new AuthResponse("Logout successful");
+    }
+
+    public AuthResponse updateProfile(UpdateProfileRequest request, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getUsername().equals(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username is already taken");
+        }
+
+        if (!user.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use");
+        }
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPasswordHash(request.getPassword());
+        }
+
+        userRepository.save(user);
+
+        return new AuthResponse("Profile updated successfully");
     }
 }
