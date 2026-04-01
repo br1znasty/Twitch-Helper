@@ -1,5 +1,3 @@
-package com.example.app.API;
-
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.Dispatcher;
@@ -15,7 +13,6 @@ public class MockTwitchServer {
 			@Override
 			public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
 				String path = request.getPath();
-				System.out.println("Mock server received request: " + path);
 
 				if (path.contains("streams")) {
 					return new MockResponse()
