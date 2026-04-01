@@ -3,10 +3,10 @@ import java.io.*;
 public class Main {
 	public static void main(String[] args) {
 		String clientId = "7id3zvr39mupx516lk2pvodoqe4lr1";
-		final String channel = args.length > 0 ? args[0] : "T2x2";
+		final String channel = args.length > 1 ? args[0] : "T2x2";
 		String clientSecret = "";
 
-		boolean mock = true;
+		boolean mock = args.length > 1 ? Boolean.parseBoolean(args[1]) : true;
 
 		try {
 			clientSecret = getSecret();
