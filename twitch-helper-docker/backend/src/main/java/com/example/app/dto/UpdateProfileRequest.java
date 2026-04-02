@@ -15,6 +15,11 @@ public class UpdateProfileRequest {
 
     private String password;
 
+    private String clientId;
+    private String clientSecret;
+    private String accessToken;
+    private Long expiredAt;
+
     public UpdateProfileRequest() {
     }
 
@@ -40,5 +45,37 @@ public class UpdateProfileRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public Long getExpiredAt() {
+        return expiredAt;
+    }
+
+    public void setExpiredAt(Long expiredAt) {
+        this.expiredAt = expiredAt;
     }
 }
