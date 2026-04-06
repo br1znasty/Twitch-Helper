@@ -61,7 +61,15 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail());
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getClientId(),
+                user.getClientSecret(),
+                user.getAccessToken(),
+                user.getExpiredAt()
+        );
     }
 
     public AuthResponse logout(HttpSession session) {
@@ -94,6 +102,28 @@ public class AuthService {
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPasswordHash(request.getPassword());
+        }
+
+        if ((user.getClientId() == null || user.getClientId().isBlank())
+                && request.getClientId() != null
+                && !request.getClientId().isBlank()) {
+            user.setClientId(request.getClientId());
+        }
+
+        if ((user.getClientSecret() == null || user.getClientSecret().isBlank())
+                && request.getClientSecret() != null
+                && !request.getClientSecret().isBlank()) {
+            user.setClientSecret(request.getClientSecret());
+        }
+
+        if ((user.getAccessToken() == null || user.getAccessToken().isBlank())
+                && request.getAccessToken() != null
+                && !request.getAccessToken().isBlank()) {
+            user.setAccessToken(request.getAccessToken());
+        }
+
+        if (user.getExpiredAt() == null && request.getExpiredAt() != null) {
+            user.setExpiredAt(request.getExpiredAt());
         }
 
         userRepository.save(user);

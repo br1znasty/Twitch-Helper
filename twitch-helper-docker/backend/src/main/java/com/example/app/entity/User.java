@@ -9,39 +9,38 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    public User() {
+    @Column(name = "client_id")
+    private String clientId;
 
+    @Column(name = "client_secret")
+    private String clientSecret;
+
+    @Column(name = "access_token")
+    private String accessToken;
+
+    @Column(name = "expired_at")
+    private Long expiredAt;
+
+    public User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;
-        this.passwordHash = password;
-    }
-
-    public Long getId1() {
-        return id;
-    }
-
-    public void setId1(Long id) {
-        this.id = id;
+        this.passwordHash = passwordHash;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -64,7 +63,39 @@ public class User {
         return passwordHash;
     }
 
-    public void setPasswordHash(String password) {
-        this.passwordHash = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public Long getExpiredAt() {
+        return expiredAt;
+    }
+
+    public void setExpiredAt(Long expiredAt) {
+        this.expiredAt = expiredAt;
     }
 }

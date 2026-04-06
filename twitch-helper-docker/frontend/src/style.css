@@ -16,7 +16,7 @@ body {
 .page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: centфer;
   justify-content: center;
   padding: 24px;
 }
@@ -278,4 +278,98 @@ input:disabled {
   .dashboard-row {
     grid-template-columns: 1fr;
   }
+}
+
+.top-align {
+  align-items: start;
+}
+
+.stats-action-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stats-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.hidden {
+  display: none;
+}
+
+.metrics-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0 4px;
+}
+
+.metrics-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+}
+
+.checkbox-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.checkbox-row input {
+  width: auto;
+  margin: 0;
+}
+
+.stats-output-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  min-height: 180px;
+}
+
+.stats-output-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 14px;
+  color: #0f172a;
+}
+
+.stats-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-result-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+.stats-result-key {
+  color: #475569;
+  font-weight: 600;
+}
+
+.stats-result-value {
+  color: #0f172a;
+  font-weight: bold;
+  text-align: right;
+  word-break: break-word;
 }
