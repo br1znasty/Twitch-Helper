@@ -1,6 +1,7 @@
 import { getCurrentUser } from "../api/authApi";
 import { navigate, render } from "../utils/navigation";
 import { updateProfile } from "../api/authApi";
+import { timestamptoDatetimeLocal } from "../utils/date";
 
 export async function renderSettingsPage(app) {
     try {
@@ -48,22 +49,22 @@ export async function renderSettingsPage(app) {
 
               <label>
                 Client ID
-                <input type="text" id="settings-client-id" value="${data.clientId ?? ""}" placeholder="Введите client_id" />
+                <input type="text" id="settings-client-id" value="${data.clientId ?? ""}" placeholder="Введите client id" />
               </label>
 
               <label>
                 Client Secret
-                <input type="text" id="settings-client-secret" value="${data.clientSecret ?? ""}" placeholder="Введите client_secret" />
+                <input type="text" id="settings-client-secret" value="${data.clientSecret ?? ""}" placeholder="Введите client secret" />
               </label>
 
               <label>
                 Access Token
-                <input type="text" id="settings-access-token" value="${data.accessToken ?? ""}" placeholder="Введите access_token" />
+                <input type="text" id="settings-access-token" value="${data.accessToken ?? ""}" placeholder="Получите access token" />
               </label>
 
               <label>
-                Expired At
-                <input type="number" id="settings-expired-at" value="${data.expiredAt ?? ""}" placeholder="Введите expired_at" />
+                Дата истечения токена
+                <input type="datetime-local" id="settings-expired-at" value="${timestamptoDatetimeLocal(data.expiredAt)}" placeholder="Дата истечения" />
               </label>
 
               <button type="submit">Обновить</button>
