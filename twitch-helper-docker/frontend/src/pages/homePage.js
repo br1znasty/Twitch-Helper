@@ -43,7 +43,7 @@ export async function renderHomePage(app) {
                     </label>
 
                     <div class="metrics-block">
-                      <div class="metrics-title">Какие показатели показать</div>
+                      <div class="metrics-title">Какие метрики показать</div>
 
                       <label class="checkbox-row"><input type="checkbox" name="metric" value="status" checked /><span>Статус стрима</span></label>
                       <label class="checkbox-row"><input type="checkbox" name="metric" value="language" /><span>Язык стрима</span></label>
@@ -113,7 +113,7 @@ export async function renderHomePage(app) {
 
             if (metrics.length === 0) {
                 statsMessage.className = "error";
-                statsMessage.textContent = "Не выбрана ни один показатель";
+                statsMessage.textContent = "Ни одна метрика не выбрана";
 
                 return
             }

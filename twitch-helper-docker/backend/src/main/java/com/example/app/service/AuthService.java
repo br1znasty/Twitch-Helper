@@ -7,15 +7,18 @@ import com.example.app.dto.UpdateProfileRequest;
 import com.example.app.dto.UserResponse;
 import com.example.app.entity.User;
 import com.example.app.repository.UserRepository;
+import com.example.app.twitch.TokenService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final TokenService tokenService;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, TokenService tokenService) {
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -129,5 +132,40 @@ public class AuthService {
         userRepository.save(user);
 
         return new AuthResponse("Profile updated successfully");
+    }
+
+    public AuthResponse refreshToken(HttpSession session) {
+        System.out.println("Refresh token service method called");
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getClientId() == null || user.getClientId().isBlank()) {
+            throw new RuntimeException("Client ID is required. Please add your Twitch Client ID in settings.");
+        }
+        if (user.getClientSecret() == null || user.getClientSecret().isBlank()) {
+            throw new RuntimeException("Client Secret is required. Please add your Twitch Client Secret in settings.");
+        }
+
+        System.out.println("Forcing token refresh...");
+        String newToken = tokenService.forceRefreshToken(user);
+        System.out.println("New token received: " + (newToken != null ? "yes" : "no"));
+
+        UserResponse userResponse = new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getClientId(),
+                user.getClientSecret(),
+                user.getAccessToken(),
+                user.getExpiredAt()
+        );
+
+        return new AuthResponse("Token refreshed successfully", userResponse);
     }
 }

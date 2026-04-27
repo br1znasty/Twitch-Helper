@@ -52,4 +52,11 @@ public class AuthController {
         AuthResponse response = authService.updateProfile(request, session);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(HttpSession session) {
+        System.out.println("Refresh token endpoint called");
+        AuthResponse response = authService.refreshToken(session);
+        return ResponseEntity.ok(response);
+    }
 }

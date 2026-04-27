@@ -62,3 +62,22 @@ export async function updateProfile(payload) {
     const data = await parseResponse(response);
     return { response, data };
 }
+
+export async function refreshToken() {
+    console.log("Calling refresh token API at:", `${API_BASE_URL}/api/auth/refresh-token`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include"
+    });
+
+    console.log("Refresh token response status:", response.status);
+    
+    const data = await parseResponse(response);
+    console.log("Refresh token response data:", data);
+    
+    return { response, data };
+}
