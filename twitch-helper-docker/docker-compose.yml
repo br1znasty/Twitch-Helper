@@ -12,6 +12,12 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d twitch_helper"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s 
 
   auth-service:
     build:
@@ -19,7 +25,8 @@ services:
       dockerfile: Dockerfile
     container_name: twitch-helper-auth-service
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/twitch_helper
       SPRING_DATASOURCE_USERNAME: postgres
@@ -33,7 +40,8 @@ services:
       dockerfile: Dockerfile
     container_name: twitch-helper-user-service
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/twitch_helper
       SPRING_DATASOURCE_USERNAME: postgres
@@ -47,7 +55,8 @@ services:
       dockerfile: Dockerfile
     container_name: twitch-helper-twitch-service
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/twitch_helper
       SPRING_DATASOURCE_USERNAME: postgres
@@ -61,9 +70,12 @@ services:
       dockerfile: Dockerfile
     container_name: twitch-helper-frontend
     depends_on:
-      - auth-service
-      - user-service
-      - twitch-service
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      twitch-service:
+        condition: service_started
     ports:
       - "3000:3000"
 
@@ -73,14 +85,15 @@ services:
       dockerfile: Dockerfile
     container_name: twitch-helper-e2e-tests
     depends_on:
-      - frontend
+      frontend:
+        condition: service_started
     environment:
       CYPRESS_baseUrl: http://frontend:3000
     volumes:
       - ./e2e/cypress:/e2e/cypress
       - ./e2e/cypress.config.js:/e2e/cypress.config.js
-      - ./e2e/cypress/videos:/e2e/cypress/videos
-      - ./e2e/cypress/screenshots:/e2e/cypress/screenshots
+      - ./test-results/videos:/e2e/cypress/videos
+      - ./test-results/screenshots:/e2e/cypress/screenshots
     profiles:
       - test
 
