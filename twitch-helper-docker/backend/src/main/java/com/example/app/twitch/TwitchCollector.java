@@ -109,9 +109,7 @@ public class TwitchCollector {
                             if (requested.contains("status")) {
                                 result.put("status", "offline");
                             }
-                            if (requested.contains("viewers")) {
-                                result.put("viewers", 0);
-                            }
+
                             return result;
                         }
 

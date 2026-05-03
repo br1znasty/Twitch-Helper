@@ -19,11 +19,17 @@ public class TokenService {
     }
 
     public String getAccessToken(User user) {
-        if (user.getAccessToken() == null || user.getExpiredAt() == null
+        if (user.getAccessToken() == null || user.getAccessToken().isEmpty()
+                || user.getExpiredAt() == null
                 || System.currentTimeMillis() > user.getExpiredAt()) {
             refreshToken(user);
         }
 
+        return user.getAccessToken();
+    }
+
+    public String forceRefreshToken(User user) {
+        refreshToken(user);
         return user.getAccessToken();
     }
 

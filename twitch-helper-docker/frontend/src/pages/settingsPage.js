@@ -1,4 +1,4 @@
-import { getCurrentUser } from "../api/authApi";
+import { getCurrentUser, refreshToken } from "../api/authApi";
 import { navigate, render } from "../utils/navigation";
 import { updateProfile } from "../api/authApi";
 import { timestamptoDatetimeLocal } from "../utils/date";
@@ -59,15 +59,18 @@ export async function renderSettingsPage(app) {
 
               <label>
                 Access Token
-                <input type="text" id="settings-access-token" value="${data.accessToken ?? ""}" placeholder="Получите access token" />
+                <div style="display: flex; gap: 10px;">
+                  <input type="text" id="settings-access-token" value="${data.accessToken ?? ""}" placeholder="Токен будет получен автоматически" readonly style="flex: 1;" />
+                  <button type="button" id="refresh-token-button" class="secondary" style="padding: 8px 16px;">Обновить токен принудительно</button>
+                </div>
               </label>
 
               <label>
                 Дата истечения токена
-                <input type="datetime-local" id="settings-expired-at" value="${timestamptoDatetimeLocal(data.expiredAt)}" placeholder="Дата истечения" />
+                <input type="datetime-local" id="settings-expired-at" value="${timestamptoDatetimeLocal(data.expiredAt)}" placeholder="Дата истечения" readonly />
               </label>
 
-              <button type="submit">Обновить</button>
+              <button type="submit">Сохранить данные профиля</button>
             </form>
 
             <div id="settings-message"></div>
@@ -83,12 +86,42 @@ export async function renderSettingsPage(app) {
 
         const form = document.getElementById("settings-form");
         const message = document.getElementById("settings-message");
+        const refreshTokenButton = document.getElementById("refresh-token-button");
+
+        refreshTokenButton.addEventListener("click", async () => {
+            message.className = "info";
+            message.textContent = "Обновление токена";
+            
+            try {
+                const { response: refreshResponse, data: refreshData } = await refreshToken();
+
+                if (!refreshResponse.ok) {
+                    message.className = "error";
+                    message.textContent = "Ошибка обновления токена";
+                    return;
+                }
+
+                if (refreshData.user) {
+                    document.getElementById("settings-access-token").value = refreshData.user.accessToken || "";
+                    document.getElementById("settings-expired-at").value = timestamptoDatetimeLocal(refreshData.user.expiredAt);
+                    message.className = "success";
+                    message.textContent = "Токен успешно обновлен";
+                }
+                else {
+                    message.className = "error";
+                    message.textContent = "Не удалось получить новый токен";
+                }
+            } catch (error) {
+                message.className = "error";
+                message.textContent = "Не удалось подключиться к серверу. Ошибка: " + error.message;
+            }
+        });
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            message.className = "";
-            message.textContent = "";
+            message.className = "info";
+            message.textContent = "Сохранение данных";
 
             const expiredAtRaw = document.getElementById("settings-expired-at").value.trim();
 
@@ -107,16 +140,13 @@ export async function renderSettingsPage(app) {
 
                 if (!updateResponse.ok) {
                     message.className = "error";
-                    message.textContent = updateData.message || "Ошибка обновления профиля";
+                    message.textContent = "Ошибка сохранения профиля";
                     return;
                 }
 
                 message.className = "success";
-                message.textContent = updateData.message || "Профиль обновлён";
+                message.textContent = "Профиль сохранён";
 
-                setTimeout(() => {
-                    renderSettingsPage(app);
-                }, 400);
             } catch (error) {
                 console.log(error);
                 message.className = "error";
