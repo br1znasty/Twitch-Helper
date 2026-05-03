@@ -67,11 +67,11 @@ services:
     ports:
       - "3000:3000"
 
-  cypress:
+  e2e-tests:
     build:
       context: ./e2e
       dockerfile: Dockerfile
-    container_name: twitch-helper-cypress
+    container_name: twitch-helper-e2e-tests
     depends_on:
       - frontend
     environment:
@@ -79,6 +79,8 @@ services:
     volumes:
       - ./e2e/cypress:/e2e/cypress
       - ./e2e/cypress.config.js:/e2e/cypress.config.js
+      - ./e2e/cypress/videos:/e2e/cypress/videos
+      - ./e2e/cypress/screenshots:/e2e/cypress/screenshots
     profiles:
       - test
 

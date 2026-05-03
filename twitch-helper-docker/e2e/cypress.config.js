@@ -6,4 +6,6 @@ export default defineConfig({
     specPattern: "cypress/e2e/**/*.spec.js",
     supportFile: false,
   },
+  video: true,
+  screenshotOnRunFailure: true,
 });

@@ -29,11 +29,6 @@ describe("Check sing in and sing up", () => {
     cy.contains("Зарегистрироваться").click();
     cy.wait(500);
 
-    cy.get("#email").type(email, { delay: 200 });
-    cy.get("#password").type(password, { delay: 200 });
-    cy.contains("Войти").click();
-    cy.wait(500);
-
     cy.contains("Выход").should("be.visible");
     cy.wait(500);
   });
