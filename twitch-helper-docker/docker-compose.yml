@@ -67,5 +67,20 @@ services:
     ports:
       - "3000:3000"
 
+  cypress:
+    build:
+      context: ./e2e
+      dockerfile: Dockerfile
+    container_name: twitch-helper-cypress
+    depends_on:
+      - frontend
+    environment:
+      CYPRESS_baseUrl: http://frontend:3000
+    volumes:
+      - ./e2e/cypress:/e2e/cypress
+      - ./e2e/cypress.config.js:/e2e/cypress.config.js
+    profiles:
+      - test
+
 volumes:
   postgres_data:

@@ -1,0 +1,14 @@
+{
+  "name": "twitch-helper-e2e",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "cy:run": "cypress run",
+    "cy:run:docker": "wait-on http://frontend:3000 && cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^13.17.0",
+    "wait-on": "^8.0.1"
+  }
+}
