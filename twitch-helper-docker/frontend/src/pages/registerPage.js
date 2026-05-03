@@ -2,7 +2,9 @@ import { registerUser } from "../api/authApi";
 import { navigate, render } from "../utils/navigation";
 
 export function renderRegisterPage(app) {
-    render(app, `<div class="page auth-page">
+  render(
+    app,
+    `<div class="page auth-page">
         <div class="card auth-card">
             <h2>Регистрация</h2>
 
@@ -31,37 +33,39 @@ export function renderRegisterPage(app) {
                 <a href="#/">Назад</a>
             </div>
         </div>
-    </div>`);
+    </div>`,
+  );
 
-    const form = document.getElementById("register-form");
-    const message = document.getElementById("register-message");
+  const form = document.getElementById("register-form");
+  const message = document.getElementById("register-message");
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-        message.className = "";
-        message.textContent = "";
+    message.className = "";
+    message.textContent = "";
 
-        const payload = {
-            username: document.getElementById("username").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            password: document.getElementById("password").value.trim()
-        };
+    const payload = {
+      username: document.getElementById("username").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value.trim(),
+    };
 
-        try {
-            const { response, data } = await registerUser(payload);
+    try {
+      const { response, data } = await registerUser(payload);
 
-            if (!response.ok) {
-                message.className = "error";
-                message.textContent = data.message || "Ошибка регистрации";
+      if (!response.ok) {
+        message.className = "error";
+        message.textContent = data.message || "Ошибка регистрации";
 
-                return;
-            }
+        return;
+      }
 
-            navigate("#/login");
-        } catch {
-            message.className = "error";
-            message.textContent = "Не удалось подключиться к серверу";
-        }
-    });
+      localStorage.setItem("userId", data.userId);
+      navigate("#/home");
+    } catch {
+      message.className = "error";
+      message.textContent = "Не удалось подключиться к серверу";
+    }
+  });
 }

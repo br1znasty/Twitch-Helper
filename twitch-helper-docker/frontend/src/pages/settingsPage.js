@@ -1,19 +1,22 @@
-import { getCurrentUser, refreshToken } from "../api/authApi";
-import { navigate, render } from "../utils/navigation";
-import { updateProfile } from "../api/authApi";
-import { timestamptoDatetimeLocal } from "../utils/date";
+import { logoutUser } from "../api/authApi.js";
+import { getCurrentUser, updateProfile } from "../api/userApi.js";
+import { refreshToken } from "../api/twitchApi.js";
+import { navigate, render } from "../utils/navigation.js";
+import { timestamptoDatetimeLocal } from "../utils/date.js";
 
 export async function renderSettingsPage(app) {
-    try {
-        const { response, data } = await getCurrentUser();
+  try {
+    const { response, data } = await getCurrentUser();
 
-        if (!response.ok) {
-            navigate("#/login");
+    if (!response.ok) {
+      navigate("#/login");
 
-            return;
-        }
+      return;
+    }
 
-        render(app, `<div class="dashboard-page">
+    render(
+      app,
+      `<div class="dashboard-page">
         <header class="dashboard-header">
           <div class="user-block">
             <div class="user-label">Пользователь</div>
@@ -76,84 +79,100 @@ export async function renderSettingsPage(app) {
             <div id="settings-message"></div>
           </section>
         </main>
-      </div>`);
+      </div>`,
+    );
 
-        document.getElementById("back-button").addEventListener("click", () => { navigate("#/home"); })
-        document.getElementById("logout-button").addEventListener("click", async () => {
-            await logoutUser();
-            navigate("#/login");
-        });
-
-        const form = document.getElementById("settings-form");
-        const message = document.getElementById("settings-message");
-        const refreshTokenButton = document.getElementById("refresh-token-button");
-
-        refreshTokenButton.addEventListener("click", async () => {
-            message.className = "info";
-            message.textContent = "Обновление токена";
-            
-            try {
-                const { response: refreshResponse, data: refreshData } = await refreshToken();
-
-                if (!refreshResponse.ok) {
-                    message.className = "error";
-                    message.textContent = "Ошибка обновления токена";
-                    return;
-                }
-
-                if (refreshData.user) {
-                    document.getElementById("settings-access-token").value = refreshData.user.accessToken || "";
-                    document.getElementById("settings-expired-at").value = timestamptoDatetimeLocal(refreshData.user.expiredAt);
-                    message.className = "success";
-                    message.textContent = "Токен успешно обновлен";
-                }
-                else {
-                    message.className = "error";
-                    message.textContent = "Не удалось получить новый токен";
-                }
-            } catch (error) {
-                message.className = "error";
-                message.textContent = "Не удалось подключиться к серверу. Ошибка: " + error.message;
-            }
-        });
-
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            message.className = "info";
-            message.textContent = "Сохранение данных";
-
-            const expiredAtRaw = document.getElementById("settings-expired-at").value.trim();
-
-            const payload = {
-                username: document.getElementById("settings-username").value.trim(),
-                email: document.getElementById("settings-email").value.trim(),
-                password: document.getElementById("settings-password").value.trim(),
-                clientId: document.getElementById("settings-client-id").value.trim(),
-                clientSecret: document.getElementById("settings-client-secret").value.trim(),
-                accessToken: document.getElementById("settings-access-token").value.trim(),
-                expiredAt: expiredAtRaw === "" ? null : Number(expiredAtRaw)
-            };
-
-            try {
-                const { response: updateResponse, data: updateData } = await updateProfile(payload);
-
-                if (!updateResponse.ok) {
-                    message.className = "error";
-                    message.textContent = "Ошибка сохранения профиля";
-                    return;
-                }
-
-                message.className = "success";
-                message.textContent = "Профиль сохранён";
-
-            } catch (error) {
-                console.log(error);
-                message.className = "error";
-                message.textContent = "Не удалось подключиться к серверу";
-            }
-        });
-    } catch {
+    document.getElementById("back-button").addEventListener("click", () => {
+      navigate("#/home");
+    });
+    document
+      .getElementById("logout-button")
+      .addEventListener("click", async () => {
+        await logoutUser();
         navigate("#/login");
-    }
+      });
+
+    const form = document.getElementById("settings-form");
+    const message = document.getElementById("settings-message");
+    const refreshTokenButton = document.getElementById("refresh-token-button");
+
+    refreshTokenButton.addEventListener("click", async () => {
+      message.className = "info";
+      message.textContent = "Обновление токена";
+
+      try {
+        const { response: refreshResponse, data: refreshData } =
+          await refreshToken();
+
+        if (!refreshResponse.ok) {
+          message.className = "error";
+          message.textContent =
+            refreshData.message || "Ошибка обновления токена";
+          return;
+        }
+
+        if (refreshData.user) {
+          document.getElementById("settings-access-token").value =
+            refreshData.user.accessToken || "";
+          document.getElementById("settings-expired-at").value =
+            timestamptoDatetimeLocal(refreshData.user.expiredAt);
+
+          message.className = "success";
+          message.textContent = "Токен успешно обновлён";
+        } else {
+          message.className = "error";
+          message.textContent = "Не удалось получить новый токен";
+        }
+      } catch (error) {
+        message.className = "error";
+        message.textContent =
+          "Не удалось подключиться к серверу. Ошибка: " + error.message;
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      message.className = "info";
+      message.textContent = "Сохранение данных";
+
+      const expiredAtRaw = document
+        .getElementById("settings-expired-at")
+        .value.trim();
+
+      const payload = {
+        username: document.getElementById("settings-username").value.trim(),
+        email: document.getElementById("settings-email").value.trim(),
+        password: document.getElementById("settings-password").value.trim(),
+        clientId: document.getElementById("settings-client-id").value.trim(),
+        clientSecret: document
+          .getElementById("settings-client-secret")
+          .value.trim(),
+        accessToken: document
+          .getElementById("settings-access-token")
+          .value.trim(),
+        expiredAt: expiredAtRaw === "" ? null : Number(expiredAtRaw),
+      };
+
+      try {
+        const { response: updateResponse, data: updateData } =
+          await updateProfile(payload);
+
+        if (!updateResponse.ok) {
+          message.className = "error";
+          message.textContent = "Ошибка сохранения профиля";
+          return;
+        }
+
+        message.className = "success";
+        message.textContent = "Профиль сохранён";
+      } catch (error) {
+        console.log(error);
+        message.className = "error";
+        message.textContent = "Не удалось подключиться к серверу";
+      }
+    });
+  } catch {
+    navigate("#/login");
+  }
 }

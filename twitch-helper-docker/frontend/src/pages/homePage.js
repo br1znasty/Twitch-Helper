@@ -1,19 +1,22 @@
-import { getCurrentUser, logoutUser } from "../api/authApi";
-import { getTwitchStatistic } from "../api/twitchApi";
+import { logoutUser } from "../api/authApi.js";
+import { getCurrentUser } from "../api/userApi.js";
+import { getTwitchStatistic } from "../api/twitchApi.js";
 import { buildStatsHtml, getSelectedMetrics } from "../components/stats";
 import { navigate, render } from "../utils/navigation";
 
 export async function renderHomePage(app) {
-    const { response, data } = await getCurrentUser();
+  const { response, data } = await getCurrentUser();
 
-    if (!response.ok) {
-        navigate("#/login");
+  if (!response.ok) {
+    navigate("#/login");
 
-        return;
-    }
+    return;
+  }
 
-    try {
-        render(app, `<div class="dashboard-page">
+  try {
+    render(
+      app,
+      `<div class="dashboard-page">
         <header class="dashboard-header">
           <div class="user-block">
             <div class="user-label">Пользователь</div>
@@ -78,68 +81,77 @@ export async function renderHomePage(app) {
             </div>
           </section>
         </main>
-      </div>`);
+      </div>`,
+    );
 
-        document.getElementById("settings-button").addEventListener("click", () => { navigate("#/settings"); })
-        document.getElementById("logout-button").addEventListener("click", async () => {
-            await logoutUser();
-            navigate("#/login");
-        });
-
-        const statsToggleButton = document.getElementById("stats-toggle-button");
-        const statsForm = document.getElementById("stats-form");
-        const statsOutput = document.getElementById("stats-output");
-        const statsMessage = document.getElementById("stats-message");
-
-        statsToggleButton.addEventListener("click", () => {
-            statsForm.classList.toggle("hidden");
-        });
-
-        statsForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            statsMessage.className = "";
-            statsMessage.textContent = "";
-
-            const channel = document.getElementById("stats-channel").value.trim();
-            const metrics = getSelectedMetrics();
-
-            if (!channel) {
-                statsMessage.className = "error";
-                statsMessage.textContent = "Введите название канала";
-
-                return;
-            }
-
-            if (metrics.length === 0) {
-                statsMessage.className = "error";
-                statsMessage.textContent = "Ни одна метрика не выбрана";
-
-                return
-            }
-
-            try {
-                statsOutput.innerHTML = `<div class="placeholder-box">Загрузка...</div>`;
-
-                const { response, data } = await getTwitchStatistic({ channel, metrics });
-
-                if (!response.ok) {
-                    statsMessage.className = "error";
-                    statsForm.textContent = data.message || "Не удалось получить статистику";
-                    statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
-
-                    return;
-                }
-
-                statsOutput.innerHTML = buildStatsHtml(data.metrics);
-            } catch (error) {
-                console.log(error);
-                statsMessage.className = "error";
-                statsMessage.textContent = "Не удалось подключиться к серверу";
-                statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
-            }
-        });
-    } catch {
+    document.getElementById("settings-button").addEventListener("click", () => {
+      navigate("#/settings");
+    });
+    document
+      .getElementById("logout-button")
+      .addEventListener("click", async () => {
+        await logoutUser();
         navigate("#/login");
-    }
+      });
+
+    const statsToggleButton = document.getElementById("stats-toggle-button");
+    const statsForm = document.getElementById("stats-form");
+    const statsOutput = document.getElementById("stats-output");
+    const statsMessage = document.getElementById("stats-message");
+
+    statsToggleButton.addEventListener("click", () => {
+      statsForm.classList.toggle("hidden");
+    });
+
+    statsForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      statsMessage.className = "";
+      statsMessage.textContent = "";
+
+      const channel = document.getElementById("stats-channel").value.trim();
+      const metrics = getSelectedMetrics();
+
+      if (!channel) {
+        statsMessage.className = "error";
+        statsMessage.textContent = "Введите название канала";
+
+        return;
+      }
+
+      if (metrics.length === 0) {
+        statsMessage.className = "error";
+        statsMessage.textContent = "Ни одна метрика не выбрана";
+
+        return;
+      }
+
+      try {
+        statsOutput.innerHTML = `<div class="placeholder-box">Загрузка...</div>`;
+
+        const { response, data } = await getTwitchStatistic({
+          channel,
+          metrics,
+        });
+
+        if (!response.ok) {
+          statsMessage.className = "error";
+          statsForm.textContent =
+            data.message || "Не удалось получить статистику";
+          statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
+
+          return;
+        }
+
+        statsOutput.innerHTML = buildStatsHtml(data.metrics);
+      } catch (error) {
+        console.log(error);
+        statsMessage.className = "error";
+        statsMessage.textContent = "Не удалось подключиться к серверу";
+        statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
+      }
+    });
+  } catch {
+    navigate("#/login");
+  }
 }

@@ -2,7 +2,9 @@ import { loginUser } from "../api/authApi";
 import { navigate, render } from "../utils/navigation";
 
 export function renderLoginPage(app) {
-    render(app, `
+  render(
+    app,
+    `
     <div class="page auth-page">
       <div class="card auth-card">
         <h2>Вход</h2>
@@ -27,36 +29,38 @@ export function renderLoginPage(app) {
           <a href="#/">Назад</a>
         </div>
       </div>
-    </div>`);
+    </div>`,
+  );
 
-    const form = document.getElementById("login-form");
-    const message = document.getElementById("login-message");
+  const form = document.getElementById("login-form");
+  const message = document.getElementById("login-message");
 
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-        message.className = "";
-        message.textContent = "";
+    message.className = "";
+    message.textContent = "";
 
-        const payload = {
-            email: document.getElementById("email").value.trim(),
-            password: document.getElementById("password").value.trim()
-        };
+    const payload = {
+      email: document.getElementById("email").value.trim(),
+      password: document.getElementById("password").value.trim(),
+    };
 
-        try {
-            const { response, data } = await loginUser(payload);
+    try {
+      const { response, data } = await loginUser(payload);
 
-            if (!response.ok) {
-                message.className = "error";
-                message.textContent = data.message || "Ошибка входа";
+      if (!response.ok) {
+        message.className = "error";
+        message.textContent = data.message || "Ошибка входа";
 
-                return;
-            }
+        return;
+      }
 
-            navigate("#/home");
-        } catch {
-            message.className = "error";
-            message.textContent = "Не удалось подключиться к серверу";
-        }
-    });
+      localStorage.setItem("userId", data.userId);
+      navigate("#/home");
+    } catch {
+      message.className = "error";
+      message.textContent = "Не удалось подключиться к серверу";
+    }
+  });
 }
