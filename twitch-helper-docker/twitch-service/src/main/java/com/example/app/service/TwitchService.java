@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 
 @Service
 public class TwitchService {
@@ -39,7 +40,7 @@ public class TwitchService {
 
         if (user.getClientId() == null || user.getClientId().isBlank()
                 || user.getClientSecret() == null || user.getClientSecret().isBlank()) {
-            throw new RuntimeException("Twitch client credentials are not configured");
+            throw new RuntimeException("Twitch client credentials are not configured. Please add your Client ID and Client Secret in profile settings.");
         }
 
         List<String> metrics = request.getMetrics();
@@ -48,11 +49,19 @@ public class TwitchService {
             throw new RuntimeException("At least one metric must be selected");
         }
 
-        Map<String, Object> selectedMetrics = twitchCollector
-                .collectSelected(user, request.getChannel(), metrics)
-                .join();
+        try {
+            Map<String, Object> selectedMetrics = twitchCollector
+                    .collectSelected(user, request.getChannel(), metrics)
+                    .join();
 
-        return new TwitchStatsResponse(request.getChannel(), selectedMetrics);
+            return new TwitchStatsResponse(request.getChannel(), selectedMetrics);
+        } catch (CompletionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException("Failed to fetch Twitch statistics: " + cause.getMessage());
+        }
     }
 
     public AuthResponse refreshToken(Long userId) {
@@ -71,7 +80,11 @@ public class TwitchService {
             throw new RuntimeException("Client Secret is required. Please add your Twitch Client Secret in settings.");
         }
 
-        tokenService.forceRefreshToken(user);
+        try {
+            tokenService.forceRefreshToken(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to refresh token: " + e.getMessage());
+        }
 
         UserResponse userResponse = toUserResponse(user);
 

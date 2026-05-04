@@ -1,4 +1,4 @@
-describe('Checking the interaction with dasgboard', () => {
+describe('Checking the interaction with dashboard', () => {
 	const channelName = "T2X2"
 
 	beforeEach(() => {
@@ -33,11 +33,16 @@ describe('Checking the interaction with dasgboard', () => {
 		cy.contains("Ни одна метрика не выбрана").should("be.visible")
 	})
 
-	//it ('Try to get metrics for a non-existent channel - scenario 8', () => {
-	//	cy.contains("Канал").should("be.visible")
+	it ('Try to get metrics for a non-existent channel - scenario 8', () => {
+		cy.contains("Канал").should("be.visible")
 
-	//	cy.get("#stats-channel").type("ASDWADASDWFFEUHGVIAW", {delay: 200})
-	//})
+		cy.get("#stats-channel").type("ABCD123456", {delay: 200})
+
+		cy.contains("Получить статистику").click()
+		cy.wait(9000)
+
+		cy.contains("Channel 'ABCD123456' does not exist on Twitch").should("be.visible")
+	})
 
 	it ('Check that we can get metrics - scenario 7', () => {
 		cy.contains("Канал").should("be.visible")

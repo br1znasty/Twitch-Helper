@@ -57,7 +57,7 @@ describe('Checking the setting page', () => {
 		for (let i = 0; i < 3; i++) {
 			cy.wait(1500)
 			cy.contains("Обновить токен принудительно").click()
-			cy.wait(2000)
+			cy.wait(3000)
 		
 			getCurrentToken().then(newToken => {
 				expect(newToken).not.to.equal(initialToken)

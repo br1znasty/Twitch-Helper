@@ -478,3 +478,22 @@ input:disabled {
   text-align: right;
   word-break: break-word;
 }
+
+input.error-input {
+  border: 2px solid #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+.stats-form.error-form {
+  border: 1px solid #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

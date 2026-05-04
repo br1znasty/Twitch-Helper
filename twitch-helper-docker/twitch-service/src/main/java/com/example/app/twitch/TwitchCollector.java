@@ -50,31 +50,61 @@ public class TwitchCollector {
     public CompletableFuture<Map<String, Object>> collectSelected(User user, String channel, List<String> metrics) {
         Set<String> requested = new HashSet<>(metrics);
 
-        CompletableFuture<Map<String, Object>> streamFuture =
-                needsStreamMetrics(requested)
-                        ? getStreamMetrics(user, channel, requested)
-                        : CompletableFuture.completedFuture(new HashMap<>());
+        return checkChannelExists(user, channel)
+                .thenCompose(channelExists -> {
+                    if (!channelExists) {
+                        throw new RuntimeException("Channel '" + channel + "' does not exist on Twitch");
+                    }
 
-        CompletableFuture<Map<String, Object>> userFuture =
-                needsUserMetrics(requested)
-                        ? getUserMetrics(user, channel, requested)
-                        : CompletableFuture.completedFuture(new HashMap<>());
+                    CompletableFuture<Map<String, Object>> streamFuture =
+                            needsStreamMetrics(requested)
+                                    ? getStreamMetrics(user, channel, requested)
+                                    : CompletableFuture.completedFuture(new HashMap<>());
 
-        CompletableFuture<Map<String, Object>> followersFuture =
-                requested.contains("followers")
-                        ? getFollowersMetric(user, channel)
-                        : CompletableFuture.completedFuture(new HashMap<>());
+                    CompletableFuture<Map<String, Object>> userFuture =
+                            needsUserMetrics(requested)
+                                    ? getUserMetrics(user, channel, requested)
+                                    : CompletableFuture.completedFuture(new HashMap<>());
 
-        return streamFuture
-                .thenCombine(userFuture, (streamMap, userMap) -> {
-                    Map<String, Object> result = new HashMap<>();
-                    result.putAll(streamMap);
-                    result.putAll(userMap);
-                    return result;
-                })
-                .thenCombine(followersFuture, (result, followersMap) -> {
-                    result.putAll(followersMap);
-                    return result;
+                    CompletableFuture<Map<String, Object>> followersFuture =
+                            requested.contains("followers")
+                                    ? getFollowersMetric(user, channel)
+                                    : CompletableFuture.completedFuture(new HashMap<>());
+
+                    return streamFuture
+                            .thenCombine(userFuture, (streamMap, userMap) -> {
+                                Map<String, Object> result = new HashMap<>();
+                                result.putAll(streamMap);
+                                result.putAll(userMap);
+                                return result;
+                            })
+                            .thenCombine(followersFuture, (result, followersMap) -> {
+                                result.putAll(followersMap);
+                                return result;
+                            });
+                });
+    }
+
+    private CompletableFuture<Boolean> checkChannelExists(User user, String channel) {
+        String token = tokenService.getAccessToken(user);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(getApiBaseUrl() + "/users?login=" + channel))
+                .header("Client-ID", user.getClientId())
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenApply(body -> {
+                    try {
+                        JSONObject json = new JSONObject(body);
+                        JSONArray data = json.getJSONArray("data");
+                        return data.length() > 0;
+                    } catch (Exception e) {
+                        return false;
+                    }
                 });
     }
 
@@ -188,6 +218,13 @@ public class TwitchCollector {
 
     private CompletableFuture<Map<String, Object>> getFollowersMetric(User user, String channel) {
         return getBroadcasterId(user, channel).thenCompose(id -> {
+            if (id == null) {
+                Map<String, Object> errorResult = new HashMap<>();
+                errorResult.put("followers", 0);
+                errorResult.put("error", "Channel not found");
+                return CompletableFuture.completedFuture(errorResult);
+            }
+
             String token = tokenService.getAccessToken(user);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -227,9 +264,11 @@ public class TwitchCollector {
                 .thenApply(body -> {
                     try {
                         JSONObject json = new JSONObject(body);
-                        return json.getJSONArray("data")
-                                .getJSONObject(0)
-                                .getString("id");
+                        JSONArray data = json.getJSONArray("data");
+                        if (data.length() == 0) {
+                            return null;
+                        }
+                        return data.getJSONObject(0).getString("id");
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to parse broadcaster id: " + e.getMessage(), e);
                     }
