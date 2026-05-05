@@ -9,7 +9,6 @@ export async function renderHomePage(app) {
 
   if (!response.ok) {
     navigate("#/login");
-
     return;
   }
 
@@ -98,6 +97,7 @@ export async function renderHomePage(app) {
     const statsForm = document.getElementById("stats-form");
     const statsOutput = document.getElementById("stats-output");
     const statsMessage = document.getElementById("stats-message");
+    const channelInput = document.getElementById("stats-channel");
 
     statsToggleButton.addEventListener("click", () => {
       statsForm.classList.toggle("hidden");
@@ -109,25 +109,27 @@ export async function renderHomePage(app) {
       statsMessage.className = "";
       statsMessage.textContent = "";
 
-      const channel = document.getElementById("stats-channel").value.trim();
+      statsForm.style.border = "";
+      channelInput.style.border = "";
+
+      const channel = channelInput.value.trim();
       const metrics = getSelectedMetrics();
 
       if (!channel) {
-        statsMessage.className = "error";
-        statsMessage.textContent = "Введите название канала";
-
+        showError(statsMessage, statsOutput, "Введите название канала");
+        channelInput.style.border = "1px solid #dc2626";
         return;
       }
 
       if (metrics.length === 0) {
-        statsMessage.className = "error";
-        statsMessage.textContent = "Ни одна метрика не выбрана";
-
+        showError(statsMessage, statsOutput, "Ни одна метрика не выбрана");
         return;
       }
 
       try {
         statsOutput.innerHTML = `<div class="placeholder-box">Загрузка...</div>`;
+        statsMessage.className = "info";
+        statsMessage.textContent = "Получение данных...";
 
         const { response, data } = await getTwitchStatistic({
           channel,
@@ -135,23 +137,37 @@ export async function renderHomePage(app) {
         });
 
         if (!response.ok) {
-          statsMessage.className = "error";
-          statsForm.textContent =
-            data.message || "Не удалось получить статистику";
-          statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
-
+          const errorMessage = data.message || "Не удалось получить статистику";
+          showError(statsMessage, statsOutput, errorMessage);
           return;
         }
 
         statsOutput.innerHTML = buildStatsHtml(data.metrics);
+        statsMessage.className = "success";
+        statsMessage.textContent = "Статистика успешно загружена";
+
+        channelInput.style.border = "";
+
+        setTimeout(() => {
+          if (statsMessage.className === "success") {
+            statsMessage.className = "";
+            statsMessage.textContent = "";
+          }
+        }, 3000);
+        
       } catch (error) {
-        console.log(error);
-        statsMessage.className = "error";
-        statsMessage.textContent = "Не удалось подключиться к серверу";
-        statsOutput.innerHTML = `<div class="placeholder-box">Нет данных</div>`;
+        console.error("Error fetching statistics:", error);
+        showError(statsMessage, statsOutput, "Не удалось подключиться к серверу");
       }
     });
-  } catch {
+  } catch (error) {
+    console.error("Error rendering home page:", error);
     navigate("#/login");
   }
+}
+
+function showError(messageElement, outputElement, errorText) {
+  messageElement.className = "error";
+  messageElement.textContent = errorText;
+  outputElement.innerHTML = `<div class="placeholder-box">Ошибка загрузки данных</div>`;
 }

@@ -6,32 +6,48 @@ function getStoredUserId() {
 }
 
 export async function getTwitchStatistic(payload) {
-  const response = await fetch(`${TWITCH_API_URL}/api/twitch/statistics`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ...payload,
-      userId: getStoredUserId(),
-    }),
-  });
+  try {
+    const response = await fetch(`${TWITCH_API_URL}/api/twitch/statistics`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...payload,
+        userId: getStoredUserId(),
+      }),
+    });
 
-  const data = await parseResponse(response);
-  return { response, data };
+    const data = await parseResponse(response);
+    return { response, data };
+  } catch (error) {
+    console.error("Network error in getTwitchStatistic:", error);
+    return {
+      response: { ok: false, status: 0 },
+      data: { message: "Сетевая ошибка. Проверьте подключение к серверу." }
+    };
+  }
 }
 
 export async function refreshToken() {
-  const response = await fetch(`${TWITCH_API_URL}/api/twitch/refresh-token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId: getStoredUserId(),
-    }),
-  });
+  try {
+    const response = await fetch(`${TWITCH_API_URL}/api/twitch/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: getStoredUserId(),
+      }),
+    });
 
-  const data = await parseResponse(response);
-  return { response, data };
+    const data = await parseResponse(response);
+    return { response, data };
+  } catch (error) {
+    console.error("Network error in refreshToken:", error);
+    return {
+      response: { ok: false, status: 0 },
+      data: { message: "Сетевая ошибка. Проверьте подключение к серверу." }
+    };
+  }
 }

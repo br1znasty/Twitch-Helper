@@ -51,8 +51,9 @@ public class TokenService {
             JSONObject accessResponse = new JSONObject(response.body());
 
             String accessToken = accessResponse.getString("access_token");
-            int expiresIn = accessResponse.getInt("expires_in");
-            long expiresAt = System.currentTimeMillis() + (expiresIn - 60) * 1000L;
+            //int expiresIn = accessResponse.getInt("expires_in");
+            //long expiresAt = System.currentTimeMillis() + (expiresIn - 60) * 1000L;
+            long expiresAt = System.currentTimeMillis() + 24 * 60 * 60 * 1000L;
 
             user.setAccessToken(accessToken);
             user.setExpiredAt(expiresAt);
