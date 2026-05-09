@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/twitch")
 public class TwitchController {
-
     private final TwitchService twitchService;
 
     public TwitchController(TwitchService twitchService) {
