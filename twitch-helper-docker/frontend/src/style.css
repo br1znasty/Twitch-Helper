@@ -497,3 +497,380 @@ input.error-input {
     opacity: 0;
   }
 }
+select,
+textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 180px;
+}
+
+.widgets-card h2 {
+  margin: 0 0 12px;
+  text-align: left;
+  font-size: 20px;
+}
+
+.widgets-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.widget-form,
+.widgets-list-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.widgets-list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.hint-box {
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.widget-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.widget-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.widget-type {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.widget-status {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.widget-status.enabled {
+  color: #16a34a;
+}
+
+.widget-status.disabled {
+  color: #dc2626;
+}
+
+.widget-config-preview {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 12px;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.widget-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+button.danger:hover {
+  background: #b91c1c;
+}
+
+.overlay-body {
+  background: transparent !important;
+}
+
+.overlay-body #app {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.overlay-root {
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.alert-overlay {
+  text-align: center;
+  padding: 24px 36px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.72);
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+}
+
+.alert-title {
+  font-size: 0.55em;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.alert-message {
+  font-weight: 800;
+}
+
+.alert-animation {
+  animation: alert-pop 0.35s ease-out;
+}
+
+.overlay-state,
+.overlay-error {
+  color: white;
+  font-size: 24px;
+  padding: 18px 24px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.75);
+}
+
+@keyframes alert-pop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .widgets-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.widget-token {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+.overlay-small-state {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.chat-position-bottom-left {
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 32px;
+}
+
+.chat-position-bottom-right {
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+.chat-widget {
+  width: 520px;
+  max-width: calc(100vw - 64px);
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.76);
+  color: white;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+}
+
+.chat-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-message-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-username {
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.chat-text {
+  color: #f8fafc;
+  word-break: break-word;
+}
+
+.chat-message-animation {
+  animation: chat-message-in 0.25s ease-out;
+}
+
+.goal-widget,
+.timer-widget,
+.stats-widget {
+  min-width: 420px;
+  max-width: 760px;
+  padding: 26px 32px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.78);
+  color: white;
+  text-align: center;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+}
+
+.goal-title,
+.timer-title,
+.stats-widget-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.goal-numbers {
+  font-size: 44px;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+.goal-bar {
+  width: 100%;
+  height: 28px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.goal-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #22c55e);
+  transition: width 0.35s ease;
+}
+
+.goal-percent {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.timer-value {
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.stats-widget {
+  text-align: left;
+}
+
+.stats-widget-title {
+  text-align: center;
+}
+
+.stats-widget-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-widget-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.stats-widget-row span {
+  color: #cbd5e1;
+}
+
+.stats-widget-row strong {
+  color: #ffffff;
+  text-align: right;
+}
+
+.widget-card textarea {
+  min-height: 120px;
+}
+
+@keyframes chat-message-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.simple-widget-form {
+  max-width: 620px;
+  margin-bottom: 28px;
+}
+
+.full-width-widget-list {
+  width: 100%;
+}
+
+.polling-widget-card .widget-description {
+  text-align: left;
+  color: #64748b;
+  margin: 10px 0 16px;
+  line-height: 1.45;
+}
+
+code {
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 6px;
+}

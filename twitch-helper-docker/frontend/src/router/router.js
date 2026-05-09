@@ -3,6 +3,7 @@ import { renderLoginPage } from "../pages/loginPage";
 import { renderRegisterPage } from "../pages/registerPage";
 import { renderSettingsPage } from "../pages/settingsPage";
 import { renderWelcomePage } from "../pages/welcomePage";
+import { renderWidgetsPage } from "../pages/widgetsPage";
 import { getRoute } from "../utils/navigation";
 
 export function initRouter() {
@@ -10,6 +11,7 @@ export function initRouter() {
 
     function router() {
         const route = getRoute();
+        document.body.classList.remove("overlay-body");
 
         switch (route) {
             case "#/register":
@@ -28,6 +30,10 @@ export function initRouter() {
                 renderSettingsPage(app);
                 break;
 
+            case "#/widgets":
+                renderWidgetsPage(app);
+                break;
+
             default:
                 renderWelcomePage(app);
                 break;
@@ -38,5 +44,4 @@ export function initRouter() {
     window.addEventListener("load", router);
 
     router();
-
 }

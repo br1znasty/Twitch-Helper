@@ -23,6 +23,7 @@ export async function renderHomePage(app) {
           </div>
 
           <div class="header-actions">
+            <button id="widgets-button" class="secondary">Виджеты</button>
             <button id="settings-button" class="secondary">Настройки</button>
             <button id="logout-button" class="secondary">Выход</button>
           </div>
@@ -82,6 +83,10 @@ export async function renderHomePage(app) {
         </main>
       </div>`,
     );
+
+    document.getElementById("widgets-button").addEventListener("click", () => {
+      navigate("#/widgets");
+    });
 
     document.getElementById("settings-button").addEventListener("click", () => {
       navigate("#/settings");

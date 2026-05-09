@@ -18,6 +18,14 @@ export default defineConfig({
         target: "http://twitch-service:8080",
         changeOrigin: true,
       },
+      "/widget": {
+        target: "http://twitch-service:8080",
+        changeOrigin: true,
+      },
+      "/obs-widget": {
+        target: "http://twitch-service:8080",
+        changeOrigin: true,
+      },
     },
   },
 });
