@@ -1,6 +1,7 @@
 import { logoutUser } from "../api/authApi.js";
 import { getCurrentUser } from "../api/userApi.js";
 import { getTwitchStatistic } from "../api/twitchApi.js";
+import { sendBotMessage, getChatMessages, getBotStatus } from "../api/botApi.js";
 import { buildStatsHtml, getSelectedMetrics } from "../components/stats";
 import { navigate, render } from "../utils/navigation";
 
@@ -75,14 +76,38 @@ export async function renderHomePage(app) {
               </div>
 
               <div class="dashboard-row">
-                <button disabled>Создание печенек</button>
-                <div class="placeholder-box">Функция пока недоступна</div>
+              <button id="bot-toggle-button">🤖 Управление ботом</button>
+              <div id="bot-panel" class="bot-panel hidden">
+                <div class="bot-status-bar">
+                  <span class="bot-indicator offline" id="bot-indicator"></span>
+                  <span id="bot-status-text">Проверка подключения...</span>
+                  <button id="start-bot-button" class="small-btn" style="display:none;">Запустить</button>
+                  <button id="stop-bot-button" class="small-btn danger" style="display:none;">Остановить</button>
+                </div>
+                
+                <div class="bot-section">
+                  <h4>📝 Отправить сообщение</h4>
+                  <div class="send-message-row">
+                    <input type="text" id="bot-message-input" placeholder="Текст сообщения..." />
+                    <button id="send-message-button" class="small-btn">Отправить</button>
+                  </div>
+                  <div id="send-message-result" class="bot-message-result"></div>
+                </div>
+                
+                <div class="bot-section">
+                  <h4>💬 Последние сообщения чата</h4>
+                  <div id="chat-messages" class="chat-messages-preview">
+                    <div class="command-placeholder">Введите канал в блоке статистики и нажмите обновить</div>
+                  </div>
+                  <button id="refresh-chat-button" class="small-btn secondary" style="margin-top: 10px;">🔄 Обновить</button>
+                </div>
               </div>
             </div>
-          </section>
-        </main>
-      </div>`,
-    );
+          </div>
+        </section>
+      </main>
+    </div>`
+  );
 
     document.getElementById("widgets-button").addEventListener("click", () => {
       navigate("#/widgets");
@@ -91,9 +116,7 @@ export async function renderHomePage(app) {
     document.getElementById("settings-button").addEventListener("click", () => {
       navigate("#/settings");
     });
-    document
-      .getElementById("logout-button")
-      .addEventListener("click", async () => {
+    document.getElementById("logout-button").addEventListener("click", async () => {
         await logoutUser();
         navigate("#/login");
       });
@@ -165,6 +188,114 @@ export async function renderHomePage(app) {
         showError(statsMessage, statsOutput, "Не удалось подключиться к серверу");
       }
     });
+
+    const botToggleButton = document.getElementById("bot-toggle-button");
+    const botPanel = document.getElementById("bot-panel");
+    const sendMessageButton = document.getElementById("send-message-button");
+    const botMessageInput = document.getElementById("bot-message-input");
+    const sendMessageResult = document.getElementById("send-message-result");
+    const refreshChatButton = document.getElementById("refresh-chat-button");
+    const botIndicator = document.getElementById("bot-indicator");
+    const botStatusText = document.getElementById("bot-status-text");
+
+    async function updateBotStatus() {
+      try {
+        const { response, data } = await getBotStatus();
+        if (response.ok && data) {
+          botIndicator.className = `bot-indicator ${data.connected ? 'online' : 'offline'}`;
+          botStatusText.textContent = data.connected ? 'Бот подключён' : 'Бот отключён';
+        } else {
+          botIndicator.className = 'bot-indicator offline';
+          botStatusText.textContent = 'Статус недоступен';
+        }
+      } catch (error) {
+        botIndicator.className = 'bot-indicator offline';
+        botStatusText.textContent = 'Ошибка подключения';
+      }
+    }
+
+    botToggleButton.addEventListener("click", () => {
+      botPanel.classList.toggle("hidden");
+      if (!botPanel.classList.contains("hidden")) {
+        updateBotStatus();
+        loadChatMessages();
+      }
+    });
+
+    sendMessageButton.addEventListener("click", async () => {
+      const message = botMessageInput.value.trim();
+      if (!message) {
+        sendMessageResult.textContent = "Введите сообщение";
+        sendMessageResult.className = "bot-message-result error";
+        return;
+      }
+    
+      sendMessageResult.textContent = "Отправка...";
+      sendMessageResult.className = "bot-message-result info";
+    
+      const { response, data } = await sendBotMessage(message);
+      if (response.ok) {
+        sendMessageResult.textContent = "✅ Сообщение отправлено!";
+        sendMessageResult.className = "bot-message-result success";
+        botMessageInput.value = "";
+        setTimeout(() => loadChatMessages(), 500);
+      } else {
+         sendMessageResult.textContent = data.message || "❌ Ошибка отправки";
+        sendMessageResult.className = "bot-message-result error";
+      }
+    
+      setTimeout(() => {
+        if (sendMessageResult.textContent !== "Отправка...") {
+          setTimeout(() => { sendMessageResult.textContent = ""; }, 3000);
+        }
+      }, 2000);
+    });
+
+    async function loadChatMessages() {
+      const channel = document.getElementById("stats-channel")?.value.trim() || "";
+      if (!channel) {
+        document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Введите название канала в блоке статистики</div>`;
+        return;
+      }
+    
+      document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Загрузка сообщений...</div>`;
+      const { response, data } = await getChatMessages(channel, 20);
+    
+      if (response.ok && Array.isArray(data)) {
+        if (data.length === 0) {
+          document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Пока нет сообщений в чате</div>`;
+        } else {
+          document.getElementById("chat-messages").innerHTML = data.map(msg => `
+            <div class="chat-message-item">
+              <strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}
+              <span class="chat-time">${formatTime(msg.timestamp)}</span>
+            </div>
+          `).join("");
+        }
+      } else {
+        document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">❌ Не удалось загрузить сообщения. Бот запущен?</div>`;
+      }
+    }
+
+    if (refreshChatButton) {
+      refreshChatButton.addEventListener("click", loadChatMessages);
+    }
+
+    let statusInterval = null;
+    const observer = new MutationObserver(() => {
+      if (!botPanel.classList.contains("hidden")) {
+        if (!statusInterval) {
+          updateBotStatus();
+          statusInterval = setInterval(updateBotStatus, 30000);
+        }
+      } else {
+        if (statusInterval) {
+          clearInterval(statusInterval);
+          statusInterval = null;
+        }
+      }
+    });
+    observer.observe(botPanel, { attributes: true, attributeFilter: ['class'] });
   } catch (error) {
     console.error("Error rendering home page:", error);
     navigate("#/login");
@@ -175,4 +306,20 @@ function showError(messageElement, outputElement, errorText) {
   messageElement.className = "error";
   messageElement.textContent = errorText;
   outputElement.innerHTML = `<div class="placeholder-box">Ошибка загрузки данных</div>`;
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString();
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === "&") return "&amp;";
+    if (m === "<") return "&lt;";
+    if (m === ">") return "&gt;";
+    return m;
+  });
 }

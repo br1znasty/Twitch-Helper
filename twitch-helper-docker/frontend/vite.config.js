@@ -18,6 +18,10 @@ export default defineConfig({
         target: "http://twitch-service:8080",
         changeOrigin: true,
       },
+      "/api/chat": {
+        target: "http://chat-bot-service:8080",
+        changeOrigin: true,
+      },
       "/widget": {
         target: "http://twitch-service:8080",
         changeOrigin: true,
