@@ -64,6 +64,8 @@ services:
     ports:
       - "8083:8080"
 
+
+
   frontend:
     build:
       context: ./frontend
@@ -89,6 +91,8 @@ services:
         condition: service_started
     environment:
       CYPRESS_baseUrl: http://frontend:3000
+      CYPRESS_TEST_CLIENT_ID: ${OUR_CLIENT_ID}
+      CYPRESS_TEST_CLIENT_SECRET: ${OUR_CLIENT_SECRET}
     volumes:
       - ./e2e/cypress:/e2e/cypress
       - ./e2e/cypress.config.js:/e2e/cypress.config.js

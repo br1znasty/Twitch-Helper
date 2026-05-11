@@ -3,3 +3,4 @@ twitch-helper-docker/test-results/
 twitch-helper-docker/load-tests/results
 twitch-helper-docker/test-results
 .idea
+.env
