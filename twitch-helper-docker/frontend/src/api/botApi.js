@@ -24,15 +24,23 @@ export async function sendBotMessage(message) {
 
 export async function getChatMessages(channel, limit = 20) {
   try {
-    const response = await fetch(
-      `${CHAT_BOT_API_URL}/api/chat/messages?channel=${encodeURIComponent(channel)}&limit=${limit}`,
-      { method: "GET", headers: { "Content-Type": "application/json" } }
-    );
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (channel) {
+      params.set("channel", channel);
+    }
+
+    const response = await fetch(`${CHAT_BOT_API_URL}/api/chat/messages?${params.toString()}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
     const data = await parseResponse(response);
     return { response, data };
   } catch (error) {
     console.error("Network error in getChatMessages:", error);
-    return { response: { ok: false, status: 0 }, data: [] };
+    return {
+      response: { ok: false, status: 0 },
+      data: { message: "Ошибка подключения к серверу бота" },
+    };
   }
 }
 

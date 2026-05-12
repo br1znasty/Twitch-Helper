@@ -76,7 +76,7 @@ export async function renderHomePage(app) {
               </div>
 
               <div class="dashboard-row">
-              <button id="bot-toggle-button">🤖 Управление ботом</button>
+              <button id="bot-toggle-button">Управление ботом</button>
               <div id="bot-panel" class="bot-panel hidden">
                 <div class="bot-status-bar">
                   <span class="bot-indicator offline" id="bot-indicator"></span>
@@ -86,7 +86,7 @@ export async function renderHomePage(app) {
                 </div>
                 
                 <div class="bot-section">
-                  <h4>📝 Отправить сообщение</h4>
+                  <h4>Отправить сообщение</h4>
                   <div class="send-message-row">
                     <input type="text" id="bot-message-input" placeholder="Текст сообщения..." />
                     <button id="send-message-button" class="small-btn">Отправить</button>
@@ -95,11 +95,11 @@ export async function renderHomePage(app) {
                 </div>
                 
                 <div class="bot-section">
-                  <h4>💬 Последние сообщения чата</h4>
+                  <h4>Последние сообщения чата</h4>
                   <div id="chat-messages" class="chat-messages-preview">
-                    <div class="command-placeholder">Введите канал в блоке статистики и нажмите обновить</div>
+                    <div class="command-placeholder">Нажмите Обновить, чтобы загрузить последние сообщения</div>
                   </div>
-                  <button id="refresh-chat-button" class="small-btn secondary" style="margin-top: 10px;">🔄 Обновить</button>
+                  <button id="refresh-chat-button" class="small-btn secondary" style="margin-top: 10px;">Обновить</button>
                 </div>
               </div>
             </div>
@@ -235,12 +235,12 @@ export async function renderHomePage(app) {
     
       const { response, data } = await sendBotMessage(message);
       if (response.ok) {
-        sendMessageResult.textContent = "✅ Сообщение отправлено!";
+        sendMessageResult.textContent = "Сообщение отправлено";
         sendMessageResult.className = "bot-message-result success";
         botMessageInput.value = "";
         setTimeout(() => loadChatMessages(), 500);
       } else {
-         sendMessageResult.textContent = data.message || "❌ Ошибка отправки";
+         sendMessageResult.textContent = data.message || "Ошибка отправки";
         sendMessageResult.className = "bot-message-result error";
       }
     
@@ -252,20 +252,17 @@ export async function renderHomePage(app) {
     });
 
     async function loadChatMessages() {
+      const chatMessages = document.getElementById("chat-messages");
       const channel = document.getElementById("stats-channel")?.value.trim() || "";
-      if (!channel) {
-        document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Введите название канала в блоке статистики</div>`;
-        return;
-      }
-    
-      document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Загрузка сообщений...</div>`;
+
+      chatMessages.innerHTML = `<div class="command-placeholder">Загрузка сообщений...</div>`;
       const { response, data } = await getChatMessages(channel, 20);
-    
+
       if (response.ok && Array.isArray(data)) {
         if (data.length === 0) {
-          document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">Пока нет сообщений в чате</div>`;
+          chatMessages.innerHTML = `<div class="command-placeholder">Пока нет сообщений в чате</div>`;
         } else {
-          document.getElementById("chat-messages").innerHTML = data.map(msg => `
+          chatMessages.innerHTML = data.map(msg => `
             <div class="chat-message-item">
               <strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}
               <span class="chat-time">${formatTime(msg.timestamp)}</span>
@@ -273,7 +270,8 @@ export async function renderHomePage(app) {
           `).join("");
         }
       } else {
-        document.getElementById("chat-messages").innerHTML = `<div class="command-placeholder">❌ Не удалось загрузить сообщения. Бот запущен?</div>`;
+        const message = data?.message || "Не удалось загрузить сообщения. Бот запущен?";
+        chatMessages.innerHTML = `<div class="command-placeholder">${escapeHtml(message)}</div>`;
       }
     }
 

@@ -11,11 +11,11 @@ import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TwitchChatService {
@@ -24,8 +24,6 @@ public class TwitchChatService {
     private TwitchClient twitchClient;
     private final ChatMessageRepository messageRepository;
     private final CommandService commandService;
-
-    private final ConcurrentHashMap<String, List<ChatMessage>> messageCache = new ConcurrentHashMap<>();
 
     @Value("${twitch.bot.username}")
     private String botUsername;
@@ -62,7 +60,7 @@ public class TwitchChatService {
     private void onMessage(ChannelMessageEvent event) {
         String user = event.getUser().getName();
         String message = event.getMessage();
-        String channel = event.getChannel().getName();
+        String channel = normalizeChannel(event.getChannel().getName());
 
         log.info("[{}] {}: {}", channel, user, message);
 
@@ -72,8 +70,6 @@ public class TwitchChatService {
         chatMessage.setMessage(message);
         chatMessage.setTimestamp(Instant.now());
         messageRepository.save(chatMessage);
-
-        messageCache.remove(channel);
 
         if (message.startsWith("!")) {
             String response = commandService.handleCommand(user, message);
@@ -91,20 +87,10 @@ public class TwitchChatService {
     }
 
     public List<ChatMessage> getRecentMessages(String channel, int limit) {
-        String cacheKey = channel + ":" + limit;
-        if (messageCache.containsKey(cacheKey)) {
-            return messageCache.get(cacheKey);
-        }
-
+        String targetChannel = normalizeChannel(channel == null || channel.isBlank() ? channelName : channel);
+        int safeLimit = Math.max(1, Math.min(limit, 200));
         Instant since = Instant.now().minusSeconds(3600);
-        List<ChatMessage> messages = messageRepository
-                .findTopByChannelAndTimestampAfterOrderByTimestampDesc(channel, since)
-                .stream()
-                .limit(limit)
-                .toList();
-
-        messageCache.put(cacheKey, messages);
-        return messages;
+        return messageRepository.findRecentMessages(targetChannel, since, PageRequest.of(0, safeLimit));
     }
 
     public String getChannelName() {
@@ -121,5 +107,13 @@ public class TwitchChatService {
             twitchClient.close();
             log.info("Bot disconnected");
         }
+    }
+
+    private String normalizeChannel(String channel) {
+        if (channel == null) {
+            return "";
+        }
+        String normalized = channel.trim().toLowerCase();
+        return normalized.startsWith("#") ? normalized.substring(1) : normalized;
     }
 }
