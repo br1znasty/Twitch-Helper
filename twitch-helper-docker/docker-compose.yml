@@ -64,6 +64,24 @@ services:
     ports:
       - "8083:8080"
 
+  chat-bot-service:
+    build:
+      context: ./chat-bot-service
+      dockerfile: Dockerfile
+    container_name: twitch-helper-chat-bot
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/twitch_helper
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      TWITCH_BOT_USERNAME: ${TWITCH_BOT_USERNAME}
+      TWITCH_BOT_OAUTH_TOKEN: ${TWITCH_BOT_OAUTH_TOKEN}
+      TWITCH_CHANNEL_NAME: ${TWITCH_CHANNEL_NAME}
+    ports:
+      - "8084:8080"
+
   frontend:
     build:
       context: ./frontend
@@ -89,6 +107,8 @@ services:
         condition: service_started
     environment:
       CYPRESS_baseUrl: http://frontend:3000
+      CYPRESS_TEST_CLIENT_ID: ${OUR_CLIENT_ID}
+      CYPRESS_TEST_CLIENT_SECRET: ${OUR_CLIENT_SECRET}
     volumes:
       - ./e2e/cypress:/e2e/cypress
       - ./e2e/cypress.config.js:/e2e/cypress.config.js
