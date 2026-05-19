@@ -1,6 +1,6 @@
 package com.example.app.service;
 
-import com.example.app.dto.FeatureFirstResponse;
+import com.example.app.dto.FeatureSecondResponse;
 import com.example.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ public class BranchTestService {
         this.userRepository = userRepository;
     }
 
-    public FeatureFirstResponse getFeatureFirstMessage() {
-        return new FeatureFirstResponse("I am feature first message!");
+    public FeatureSecondResponse getFeatureFirstMessage() {
+        return new FeatureSecondResponse("I am feature ssecond message!");
     }
 }

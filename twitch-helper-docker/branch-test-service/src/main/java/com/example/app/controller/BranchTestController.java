@@ -1,6 +1,6 @@
 package com.example.app.controller;
 
-import com.example.app.dto.FeatureFirstResponse;
+import com.example.app.dto.FeatureSecondResponse;
 import com.example.app.service.BranchTestService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +13,8 @@ public class BranchTestController {
         this.branchTestService = branchTestService;
     }
 
-    @GetMapping("/feature-first")
-    public FeatureFirstResponse getFeatureFirstMessage() {
-        return branchTestService.getFeatureFirstMessage();
+    @GetMapping("/feature-second")
+    public FeatureFirstResponse getFeatureSecondMessage() {
+        return branchTestService.getFeatureSecondMessage();
     }
 }
