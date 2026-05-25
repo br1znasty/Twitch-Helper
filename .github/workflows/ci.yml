@@ -26,19 +26,19 @@ jobs:
           cache: maven
 
       - name: Run unit tests — auth-service
-        working-directory: auth-service
+        working-directory: twitch-helper-docker/auth-service
         run: ./mvnw test --no-transfer-progress
 
       - name: Run unit tests — user-service
-        working-directory: user-service
+        working-directory: twitch-helper-docker/user-service
         run: ./mvnw test --no-transfer-progress
 
       - name: Run unit tests — chat-bot-service
-        working-directory: chat-bot-service
+        working-directory: twitch-helper-docker/chat-bot-service
         run: ./mvnw test --no-transfer-progress
 
       - name: Run unit tests — twitch-service
-        working-directory: twitch-service
+        working-directory: twitch-helper-docker/twitch-service
         run: ./mvnw test --no-transfer-progress
 
       - name: Upload test reports
