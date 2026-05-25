@@ -47,10 +47,10 @@ jobs:
         with:
           name: unit-test-reports
           path: |
-            auth-service/target/surefire-reports/
-            user-service/target/surefire-reports/
-            chat-bot-service/target/surefire-reports/
-            twitch-service/target/surefire-reports/
+            twitch-helper-docker/auth-service/target/surefire-reports/
+            twitch-helper-docker/user-service/target/surefire-reports/
+            twitch-helper-docker/chat-bot-service/target/surefire-reports/
+            twitch-helper-docker/twitch-service/target/surefire-reports/
 
   # ──────────────────────────────────────────
   # JOB 2: E2E + Load tests (с Docker)
