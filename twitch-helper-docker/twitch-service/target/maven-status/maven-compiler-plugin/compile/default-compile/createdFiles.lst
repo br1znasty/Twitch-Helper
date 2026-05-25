@@ -1,0 +1,17 @@
+com\example\app\TwitchServiceApplication.class
+com\example\app\controller\ObsWidgetController.class
+com\example\app\controller\TwitchController.class
+com\example\app\dto\UserIdRequest.class
+com\example\app\dto\AuthResponse.class
+com\example\app\dto\TwitchStatsResponse.class
+com\example\app\dto\UserResponse.class
+com\example\app\entity\User.class
+com\example\app\repository\UserRepository.class
+com\example\app\exception\GlobalExceptionHandler.class
+com\example\app\config\WebConfig$1.class
+com\example\app\service\TwitchService.class
+com\example\app\exception\ErrorResponse.class
+com\example\app\twitch\TwitchCollector.class
+com\example\app\twitch\TokenService.class
+com\example\app\dto\TwitchStatsRequest.class
+com\example\app\config\WebConfig.class

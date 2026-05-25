@@ -1,0 +1,5 @@
+# Created at 2026-05-26T03:06:57.205
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\twitch-service\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
