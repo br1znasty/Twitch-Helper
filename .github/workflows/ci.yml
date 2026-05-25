@@ -77,19 +77,19 @@ jobs:
           EOF
 
       - name: Start infrastructure (DB + services + frontend)
-	working-directory: twitch-helper-docker
+        working-directory: twitch-helper-docker
         run: |
           docker compose up -d --build db auth-service user-service twitch-service chat-bot-service frontend
           docker compose ps
 
       - name: Wait for services to be healthy
-	working-directory: twitch-helper-docker
+        working-directory: twitch-helper-docker
         run: |
           echo "Waiting for services..."
           sleep 30
 
       - name: Run E2E tests
-	working-directory: twitch-helper-docker
+        working-directory: twitch-helper-docker
         run: docker compose --profile e2e-test up --build --abort-on-container-exit e2e-tests
 
       - name: Upload E2E results
@@ -100,7 +100,7 @@ jobs:
           path: test-results/
 
       - name: Run Load tests
-	working-directory: twitch-helper-docker
+        working-directory: twitch-helper-docker
         run: docker compose --profile load-test up --build --abort-on-container-exit load-tests
 
       - name: Upload Load test results
@@ -112,5 +112,5 @@ jobs:
 
       - name: Tear down
         if: always()
-	working-directory: twitch-helper-docker
+        working-directory: twitch-helper-docker
         run: docker compose down -v
