@@ -64,19 +64,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Создаём .env рядом с docker-compose.yml
-      # Значения хранятся в GitHub Secrets (Settings → Secrets and variables → Actions)
-      - name: Create .env file
-        run: |
-          cat <<EOF > .env
-          TWITCH_BOT_USERNAME=${{ secrets.TWITCH_BOT_USERNAME }}
-          TWITCH_BOT_OAUTH_TOKEN=${{ secrets.TWITCH_BOT_OAUTH_TOKEN }}
-          TWITCH_CHANNEL_NAME=${{ secrets.TWITCH_CHANNEL_NAME }}
-          OUR_CLIENT_ID=${{ secrets.OUR_CLIENT_ID }}
-          OUR_CLIENT_SECRET=${{ secrets.OUR_CLIENT_SECRET }}
-          EOF
-
       - name: Start infrastructure (DB + services + frontend)
+        env:
+          TWITCH_BOT_USERNAME: ${{ secrets.TWITCH_BOT_USERNAME }}
+          TWITCH_BOT_OAUTH_TOKEN: ${{ secrets.TWITCH_BOT_OAUTH_TOKEN }}
+          TWITCH_CHANNEL_NAME: ${{ secrets.TWITCH_CHANNEL_NAME }}
+          OUR_CLIENT_ID: ${{ secrets.OUR_CLIENT_ID }}
+          OUR_CLIENT_SECRET: ${{ secrets.OUR_CLIENT_SECRET }}
         working-directory: twitch-helper-docker
         run: |
           docker compose up -d --build db auth-service user-service twitch-service chat-bot-service frontend
