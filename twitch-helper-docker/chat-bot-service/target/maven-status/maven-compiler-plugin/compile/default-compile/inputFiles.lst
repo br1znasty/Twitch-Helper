@@ -1,8 +1,0 @@
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\service\CommandService.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\controller\ChatController.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\entity\ChatMessage.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\dto\ChatMessageDto.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\controller\SendMessageRequest.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\service\TwitchChatService.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\repository\ChatMessageRepository.java
-D:\Twitch Helper\Twitch-Helper\twitch-helper-docker\chat-bot-service\src\main\java\com\example\app\ChatBotApplication.java

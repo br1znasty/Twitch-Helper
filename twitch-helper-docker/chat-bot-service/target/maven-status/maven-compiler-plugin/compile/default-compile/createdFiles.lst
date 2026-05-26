@@ -1,8 +1,0 @@
-com\example\app\ChatBotApplication.class
-com\example\app\controller\ChatController.class
-com\example\app\controller\SendMessageRequest.class
-com\example\app\entity\ChatMessage.class
-com\example\app\service\CommandService.class
-com\example\app\repository\ChatMessageRepository.class
-com\example\app\service\TwitchChatService.class
-com\example\app\dto\ChatMessageDto.class
