@@ -8,4 +8,8 @@ public class BranchController {
     public String getFSecond() {
         return "Welcome fs";
     }
+
+    public String getFirst() {
+        return "I am first feature";
+    }
 }
