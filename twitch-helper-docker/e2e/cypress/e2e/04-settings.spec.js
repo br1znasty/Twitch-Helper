@@ -1,6 +1,6 @@
 describe('Checking the setting page', () => {
-	const clientID = Cypress.env("TEST_CLIENT_ID")
-	const clientSecret = Cypress.env("TEST_CLIENT_SECRET")
+	const clientID = Cypress.env("CLIENT_ID")
+	const clientSecret = Cypress.env("CLIENT_SECRET")
 
 	beforeEach(() => {
 		cy.loginAs("main123@example.org", "123456");
