@@ -59,18 +59,18 @@ jobs:
     name: E2E & Load Tests
     runs-on: ubuntu-latest
     needs: unit-tests   # запускается только если unit-tests прошли
-
+    env:
+      TWITCH_BOT_USERNAME: ${{ secrets.TWITCH_BOT_USERNAME }}
+      TWITCH_BOT_OAUTH_TOKEN: ${{ secrets.TWITCH_BOT_OAUTH_TOKEN }}
+      TWITCH_CHANNEL_NAME: ${{ secrets.TWITCH_CHANNEL_NAME }}
+      OUR_CLIENT_ID: ${{ secrets.OUR_CLIENT_ID }}
+      OUR_CLIENT_SECRET: ${{ secrets.OUR_CLIENT_SECRET }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Start infrastructure (DB + services + frontend)
-        env:
-          TWITCH_BOT_USERNAME: ${{ secrets.TWITCH_BOT_USERNAME }}
-          TWITCH_BOT_OAUTH_TOKEN: ${{ secrets.TWITCH_BOT_OAUTH_TOKEN }}
-          TWITCH_CHANNEL_NAME: ${{ secrets.TWITCH_CHANNEL_NAME }}
-          OUR_CLIENT_ID: ${{ secrets.OUR_CLIENT_ID }}
-          OUR_CLIENT_SECRET: ${{ secrets.OUR_CLIENT_SECRET }}
         working-directory: twitch-helper-docker
         run: |
           docker compose up -d --build db auth-service user-service twitch-service chat-bot-service frontend
